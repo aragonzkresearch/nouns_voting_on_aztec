@@ -2,8 +2,10 @@
 name = "voting_contract"
 type = "contract"
 authors = [""]
-compiler_version = "0.16.0"
+compiler_version = "0.17.0-aztec.5"
 
 [dependencies]
 aztec = { git="https://github.com/AztecProtocol/aztec-packages/", tag="aztec-packages-v0.9.0", directory="yarn-project/aztec-nr/aztec" }
 safe_math = { git="https://github.com/AztecProtocol/aztec-packages/", tag="aztec-packages-v0.9.0", directory="yarn-project/aztec-nr/safe-math" }
+noir_bigint = { tag = "v0.1.0", git = "https://github.com/shuklaayush/noir-bigint", directory = "crates/biguint" }
+noir_primefield = { tag = "v0.1.0", git = "https://github.com/shuklaayush/noir-bigint", directory = "crates/primefield" }

@@ -1,0 +1,36 @@
+##### Contract Compilation ########
+aztec-cli compile .
+##### Contract Deployment ##########
+aztec-cli deploy target/Voting.json
+########## Save the contract deployment address ######
+export CONTRACT_ADDRESS=<output of previous command>
+##### Account creation ###########
+aztec-cli create-account
+###### Save the account data #######
+export ACCOUNT_ADDRESS=...
+export PRIVATE_KEY=...
+export PARTIAL_ADDRESS=0x03f8d0267a4f439fc1bdbbb96345adc52c8834f24264e15d0acdcbe2b2a05ecf
+############ Run a contract function ##################
+aztec-cli send mint_vote_and_nullifier\
+ -a $ACCOUNT_ADDRESS 0 0 1 0x1ef27ec9d27d6534d0f1a2fc753e9858913e693c08e78f2089159f47dd62e985 0x2ac3e8874c4050008dc3e71dffb1e27e7ba031be2b11a736c7a6d1e50388b72d\
+ -c target/Voting.json\
+ -ca $CONTRACT_ADDRESS\
+ -k $PRIVATE_KEY
+ ########################### Error reported by the aztec-cli #####################
+ Error in command execution
+NoRetryError: (JSON-RPC PROPAGATED) Cannot satisfy constraint
+    at defaultFetch (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/foundation/dest/json-rpc/client/json_rpc_client.js:47:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async retry (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/foundation/dest/retry/index.js:47:20)
+    at async file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/foundation/dest/json-rpc/client/json_rpc_client.js:64:16
+    at async request (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/foundation/dest/json-rpc/client/json_rpc_client.js:82:21)
+    at async ContractFunctionInteraction.simulate (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/aztec.js/dest/contract/base_contract_interaction.js:17:19)
+    at async file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/aztec.js/dest/contract/base_contract_interaction.js:31:36
+    at async SentTx.getTxHash (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/@aztec/aztec.js/dest/contract/sent_tx.js:26:16)
+    at async Command.<anonymous> (file:///home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/dest/index.js:395:37)
+    at async Command.parseAsync (/home/daniele/.nvm/versions/node/v18.18.0/lib/node_modules/@aztec/cli/node_modules/commander/lib/command.js:935:5)
+##########################################################################################
+The explanation of the error above is not enough explanatory. Further investigation is still needed.
+The problem should be in the line "storage.balances.at(address).add(vote_and_nullifier);" of the "mint_vote_and_nullifier" function.
+
+

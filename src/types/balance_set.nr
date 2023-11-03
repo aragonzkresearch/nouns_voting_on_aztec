@@ -2,13 +2,13 @@ use dep::aztec::context::Context;
 use dep::aztec::types::address::AztecAddress;
 use dep::aztec::state_vars::set::Set;
 
-use crate::types::vote_note::{VoteNote,VOTE_NOTE_LEN,VoteNoteMethods};
-use crate::types::vote_utils::VoteProverInput;
+use crate::types::vote_note::{VoteAndNullifierNote,VOTE_AND_NULLIFIER_NOTE_LEN,VoteNoteMethods};
+use crate::types::vote_utils::VoteAndNullifier;
 
 struct BalanceSet {
   context: Context,
   owner: AztecAddress,
-  set: Set<VoteNote, VOTE_NOTE_LEN>
+  set: Set<VoteAndNullifierNote, VOTE_AND_NULLIFIER_NOTE_LEN>
 }
 
 impl BalanceSet {
@@ -24,8 +24,8 @@ impl BalanceSet {
             set,
         }
     }
-    pub fn add(self, vote: VoteProverInput) {
-        let mut vote_note = VoteNote::new(vote, self.owner);
+    pub fn add(self, vote: VoteAndNullifier) {
+        let mut vote_note = VoteAndNullifierNote::new(vote, self.owner);
         self.set.insert(&mut vote_note);
     }
 }

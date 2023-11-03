@@ -41,9 +41,15 @@ struct PublicVote {
     h_id: Field,
 }
 
+impl PublicVote {
+    fn dummy_tally(self) -> Field {
+        1
+    }
+}
+
 global PUBLIC_VOTE_SERIALIZED_LEN: Field = 4;
 
-fn deserializePublicVote(fields: [Field; PUBLIC_VOTE_SERIALIZED_LEN]) -> PublicVote {
+fn deserializeVote(fields: [Field; PUBLIC_VOTE_SERIALIZED_LEN]) -> PublicVote {
     PublicVote {
         a: Point { x: fields[0], y: fields[1]},
         b: fields[2],
@@ -51,23 +57,23 @@ fn deserializePublicVote(fields: [Field; PUBLIC_VOTE_SERIALIZED_LEN]) -> PublicV
     }
 }
 
-fn serializePublicVote(value: PublicVote) -> [Field; PUBLIC_VOTE_SERIALIZED_LEN] {
+fn serializeVote(value: PublicVote) -> [Field; PUBLIC_VOTE_SERIALIZED_LEN] {
     [value.a.x, value.a.y, value.b, value.h_id]
 }
 
 global PublicVoteSerializationMethods = TypeSerializationInterface {
-    deserialize: deserializePublicVote,
-    serialize: serializePublicVote,
+    deserialize: deserializeVote,
+    serialize: serializeVote,
 };
 
-struct PublicVoteAndNullifier {
+struct VoteAndNullifier {
     a: Point,
     b: Field,
     n: Field,
     h_id: Field,
 }
 
-impl PublicVoteAndNullifier {
+impl VoteAndNullifier {
     fn serialize(self) -> [Field;5] {
         [self.a.x, self.a.y, self.b, self.n, self.h_id]
     }
@@ -85,7 +91,7 @@ impl VoteProverInput{
         ] 
     }
     
-    fn verify_vote (self) -> PublicVoteAndNullifier {
+    fn verify_vote (self) -> VoteAndNullifier {
         let bjj_curve = baby_jubjub().curve;
 
         // Check signatures
@@ -114,7 +120,16 @@ impl VoteProverInput{
             b1 = b1 | array_eq(self.nft_id, NFT_ID_LIST[i]);
         }
         assert(b0 & b1);
-        PublicVoteAndNullifier{
+        VoteAndNullifier{
+            a: self.a,
+            b: self.b,
+            n: self.n,
+            h_id: self.h_id
+            }
+    }
+
+    fn dummy_verify_vote(self) -> VoteAndNullifier {
+        VoteAndNullifier{
             a: self.a,
             b: self.b,
             n: self.n,
@@ -131,3 +146,49 @@ fn point_eq(p: Point, q: Point) -> bool {
 fn array_eq(p: [Field;2], q: [Field;2]) -> bool {
     (p[0] == q[0]) & (p[1] == q[1])
 }
+
+
+struct NullifierList {
+    vals: [Field; 256],
+}
+
+global NULLIFIER_LIST_SERIALIZED_LEN = 256;
+
+fn deserializeNullifierList(fields: [Field; NULLIFIER_LIST_SERIALIZED_LEN]) -> NullifierList {
+    NullifierList {
+        vals: fields,
+    }
+}
+
+fn serializeNullifierList(value: NullifierList) -> [Field; NULLIFIER_LIST_SERIALIZED_LEN] {
+    value.vals
+}
+
+global NullifiersSerializationMethods = TypeSerializationInterface {
+    deserialize: deserializeNullifierList,
+    serialize: serializeNullifierList,
+};
+
+struct TallyResults {
+    votes_zero: Field,
+    votes_one: Field,
+    votes_two: Field,
+}
+
+global TALLY_RESULTS_SERIALIZED_LEN = 3;
+fn deserializeTallyResults(fields: [Field; TALLY_RESULTS_SERIALIZED_LEN]) -> TallyResults {
+    TallyResults {
+        votes_zero: fields[0],
+        votes_one: fields[1],
+        votes_two: fields[2],
+    }
+}
+
+fn serializeTallyResults(value: TallyResults) -> [Field; TALLY_RESULTS_SERIALIZED_LEN] {
+    [value.votes_zero, value.votes_one, value.votes_two]
+}
+
+global TallyResultsSerializationMethods = TypeSerializationInterface {
+    deserialize: deserializeTallyResults,
+    serialize: serializeTallyResults,
+};
